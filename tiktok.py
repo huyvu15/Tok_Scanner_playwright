@@ -5,7 +5,11 @@ import json
 def collect_user_profiles_and_info():
     with sync_playwright() as p:
         # Mở trình duyệt
-        browser = p.chromium.launch(headless=False)  # headless=False để thấy trình duyệt đang chạy
+        browser = p.chromium.launch(headless=False, proxy={
+            "server": "http://api.yourproxy.click:5108",
+            "username": "mobi8",
+            "password": "Infi2132"
+        })
         page = browser.new_page()
 
         # Điều hướng đến trang TikTok
@@ -15,7 +19,7 @@ def collect_user_profiles_and_info():
         time.sleep(2)
 
         # Cuộn trang để tải thêm nội dung (scrolling)
-        for _ in range(5):  # Cuộn trang 5 lần
+        for _ in range(50):  # Cuộn trang 5 lần
             page.evaluate('window.scrollBy(0, window.innerHeight)')
             time.sleep(2)  # Đợi trang tải thêm
 
@@ -43,8 +47,8 @@ def collect_user_profiles_and_info():
             following_count = page.inner_text("strong[data-e2e='following-count']")
             likes_count = page.inner_text("strong[data-e2e='likes-count']")
 
-            # Lấy phần bio (quote)
-            bio_element = page.query_selector("div[data-e2e='profile-description']")
+            # Lấy phần bio (quote) từ <h2> với data-e2e="user-bio"
+            bio_element = page.query_selector("h2[data-e2e='user-bio']")
             bio = bio_element.inner_text() if bio_element else "No bio available"
 
             # Lấy link dưới profile
